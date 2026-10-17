@@ -426,3 +426,11 @@ FodyWeavers.xsd
 
 # Official VS Code C# Dev Kit Extension exclusion
 #*.lscache
+
+# Angular laboratory
+/dist/
+/.angular/
+/coverage/
+.env.*
+*.p12
+*.key
