@@ -1,0 +1,22 @@
+# Build-only scaffold; deployment stages come later.
+trigger:
+  branches:
+    include: [main]
+pr:
+  branches:
+    include: [main]
+pool:
+  vmImage: 'ubuntu-latest'
+steps:
+  - task: NodeTool@0
+    inputs:
+      versionSpec: '22.x'
+  - script: |
+      npm install --no-audit --no-fund
+      npm run build
+    displayName: 'Install and build Angular'
+  - task: PublishPipelineArtifact@1
+    inputs:
+      targetPath: '$(Build.SourcesDirectory)/dist/laboratory/browser'
+      artifact: 'angular-browser'
+      publishLocation: 'pipeline'
