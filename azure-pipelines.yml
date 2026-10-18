@@ -6,7 +6,7 @@ pr:
   branches:
     include: [development]
 pool:
-  vmImage: 'ubuntu-latest'
+  name: Laboratory-Apps-Build
 steps:
   - task: NodeTool@0
     inputs:
