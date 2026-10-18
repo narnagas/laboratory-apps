@@ -1,10 +1,10 @@
 # Build-only scaffold; deployment stages come later.
 trigger:
   branches:
-    include: [main]
+    include: [development]
 pr:
   branches:
-    include: [main]
+    include: [development]
 pool:
   vmImage: 'ubuntu-latest'
 steps:
