@@ -1,4 +1,8 @@
 # Build-only scaffold; deployment stages come later.
+
+# Laboratory Apps - Development Build Pipeline
+# Build-only scaffold; deployment stages come later.
+
 trigger:
   branches:
     include: [development]
@@ -11,35 +15,41 @@ pool:
   name: Laboratory-Apps-Build
 
 steps:
+  - checkout: self
+    clean: true
+
   - task: NodeTool@0
+    displayName: 'Install Node.js 22'
     inputs:
       versionSpec: '22.x'
 
-  - script: |
-      npm install --no-audit --no-fund
-      npm run build
-    displayName: 'Install and build Angular'
-
   - powershell: |
-      Write-Host "Build source directory:"
-      Write-Host "$(Build.SourcesDirectory)"
+      $ErrorActionPreference = "Stop"
 
-      Write-Host "Checking dist directory..."
+      Write-Host "Installing dependencies..."
+      npm install --no-audit --no-fund
 
-      $distPath = "$(Build.SourcesDirectory)\dist"
-
-      if (Test-Path $distPath) {
-        Get-ChildItem $distPath -Recurse |
-          Select-Object FullName
+      if ($LASTEXITCODE -ne 0) {
+        throw "npm install failed"
       }
-      else {
-        throw "dist directory does not exist."
+
+      Write-Host "Building Angular development configuration..."
+      npm run build:dev
+
+      if ($LASTEXITCODE -ne 0) {
+        throw "Angular development build failed"
       }
-    displayName: 'Verify Angular Build Output'
+
+      Write-Host "Checking generated build folders..."
+      Get-ChildItem "$(Build.SourcesDirectory)\dist" -Recurse |
+        Select-Object FullName
+
+    workingDirectory: '$(Build.SourcesDirectory)'
+    displayName: 'Install and Build Angular (Development)'
 
   - task: PublishPipelineArtifact@1
+    displayName: 'Publish Angular Browser'
     inputs:
       targetPath: '$(Build.SourcesDirectory)/dist/laboratory/browser'
       artifact: 'angular-browser'
       publishLocation: 'pipeline'
-
